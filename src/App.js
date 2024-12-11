@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import Home from './Home';
-import Search from './Search';
-import Profile from './Profile';
+import Login from "./Login";
+import Home from "./Home"; // Your existing components
+import Search from "./Search";
+import Profile from "./Profile";
 
-function App() {
+const App = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        // Check login state from localStorage
+        const loggedIn = localStorage.getItem("isLoggedIn");
+        setIsLoggedIn(loggedIn === "true");
+    }, []);
+
+    const handleLogin = () => {
+        setIsLoggedIn(true);
+    };
+
+    if (!isLoggedIn) {
+        return <Login onLogin={handleLogin} />;
+    }
+
     return (
         <BrowserRouter>
             <Routes>
