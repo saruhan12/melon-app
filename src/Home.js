@@ -77,7 +77,6 @@ function Home() {
     return (
         <div style={{ textAlign: 'left', padding: '20px', position: 'relative' }} >
             <Modal isOpen={isModalOpen} book={selectedBook} onClose={closeModal} />
-            <h1>Welcome to Melon</h1>
             <h2>Recommended for You</h2>
             <div style={{ position: 'relative', padding: '0 20px' }}>
                 <Slider {...settings}>
