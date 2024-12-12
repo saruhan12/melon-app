@@ -85,7 +85,7 @@ function Search() {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: '20px', backgroundColor: '#FFD54F', minHeight: '100vh' }}> {/* Melon color background */}
             <h1>Search Page</h1>
             <Modal isOpen={isModalOpen} book={selectedBook} onClose={closeModal} />
             {Object.keys(genres).map((genre) => (
