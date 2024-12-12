@@ -45,7 +45,7 @@ function App() {
                 }}
               />
               {/* Home Button */}
-              <Link to="/">
+              <Link to="/home">
                 <button
                   style={{
                     padding: "10px 20px",
