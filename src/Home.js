@@ -75,12 +75,26 @@ function Home() {
     };
 
     return (
-        <div style={{ textAlign: 'center', padding: '20px', position: 'relative' }}>
+        <div style={{ textAlign: 'left', padding: '20px', position: 'relative' }} >
             <Modal isOpen={isModalOpen} book={selectedBook} onClose={closeModal} />
-            <h1>Welcome to the Book Recommendation App</h1>
+            <h1>Welcome to Melon</h1>
             <h2>Recommended for You</h2>
             <div style={{ position: 'relative', padding: '0 20px' }}>
                 <Slider {...settings}>
+                    {recommendedBooks.map((book, index) => (
+                        <div
+                            key={index}
+                            style={{ padding: '10px', textAlign: 'center', cursor: 'pointer' }}
+                            onClick={() => openModal(book)}
+                        >
+                            <h3>{book.title}</h3>
+                        </div>
+                    ))}
+                </Slider>
+            </div>
+            <h2>Todays Top Books</h2>
+            <div style={{ position: 'relative', padding: '0 20px' }}>
+            <Slider {...settings}>
                     {recommendedBooks.map((book, index) => (
                         <div
                             key={index}
