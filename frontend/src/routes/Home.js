@@ -75,7 +75,7 @@ function Home() {
     };
 
     return (
-        <div style={{ textAlign: 'left', padding: '20px', position: 'relative' }} >
+        <div style={{ textAlign: 'left', padding: '20px', position: 'relative', backgroundColor: '#FFD54F', minHeight: '100vh' }} >
             <Modal isOpen={isModalOpen} book={selectedBook} onClose={closeModal} />
             <h2>Recommended for You</h2>
             <div style={{ position: 'relative', padding: '0 20px' }}>

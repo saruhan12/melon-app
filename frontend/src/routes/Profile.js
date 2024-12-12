@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import Slider from 'react-slick';
-import Modal from './Modal';
+import React, { useState } from "react";
+import Slider from "react-slick";
+import Modal from "./Modal";
 
 function Profile() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,7 +37,7 @@ function Profile() {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
+        <div style={{ backgroundColor: '#FFD54F', minHeight: '100vh', width: '100%', padding: '20px' }}> {/* Melon color background */}
             <h1>Profile Page</h1>
             <Modal isOpen={isModalOpen} book={selectedBook} onClose={closeModal} />
             {Object.keys(userFavorites).map((category) => (
