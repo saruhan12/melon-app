@@ -59,62 +59,40 @@ const TopBar = () => {
     </Box>
   );
 };
-
+//<AuthProvider>
+//<AppContent />
+//</AuthProvider>
 const App = () => {
   return (
     <ChakraProvider>
       <Router>
-        <AuthProvider>
+        
           <AppContent />
-        </AuthProvider>
+        
       </Router>
     </ChakraProvider>
   );
 };
 
 const AppContent = () => {
-  const { user, loading } = useAuth();
+  //const { user, loading } = useAuth();
 
-  if (loading) {
-    return <div>Loading...</div>; // Loading screen
-  }
-
+  //if (loading) {
+    //return <div>Loading...</div>; // Loading screen
+  //}
+  //{user && <TopBar />} in line 85 olmalı
   return (
-    <>
-      {user && <TopBar />}
-
+    <ChakraProvider>
+    
+      
+    <TopBar />
       <Routes>
-        <Route
-          element={
-            <PrivateRoute>
-              <Layout>
-                <Menu />
-              </Layout>
-            </PrivateRoute>
-          }
-          path="/"
-        />
-        <Route
-          element={
-            <Layout>
-              <Login />
-            </Layout>
-          }
-          path="/login"
-        />
-        <Route
-          element={
-            <Layout>
-              <Register />
-            </Layout>
-          }
-          path="/register"
-        />
+        
         <Route path="/home" element={<Home />} />
         <Route path="/search" element={<Search />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
-    </>
+    </ChakraProvider>
   );
 };
 

@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
-import Modal from './Modal'; // Import the reusable Modal component
+import Papa from 'papaparse';
+import Modal from './Modal';
 
 function Home() {
+    const [books, setBooks] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
 
-    const recommendedBooks = [
-        { title: "The Great Gatsby", author: "F. Scott Fitzgerald", reviews: ["Amazing!", "Timeless classic."] },
-        { title: "To Kill a Mockingbird", author: "Harper Lee", reviews: ["Powerful.", "A must-read."] },
-        { title: "1984", author: "George Orwell", reviews: ["Chillingly relevant.", "Thought-provoking."] },
-        { title: "Pride and Prejudice", author: "Jane Austen", reviews: ["Romantic and witty.", "A masterpiece."] },
-        { title: "Moby Dick", author: "Herman Melville", reviews: ["Epic tale.", "Challenging but rewarding."] },
-    ];
+    useEffect(() => {
+        Papa.parse('/booksConnu.csv', {
+            download: true,
+            header: true,
+            complete: (results) => {
+                setBooks(results.data);
+            },
+        });
+    }, []);
+
+    const getRandomBooks = (count) => {
+        const shuffled = books.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    };
 
     const openModal = (book) => {
         setSelectedBook(book);
@@ -29,7 +38,7 @@ function Home() {
             onClick={onClick}
             style={{
                 position: 'absolute',
-                left: '-40px',
+                left: '-20px',
                 top: '50%',
                 transform: 'translateY(-50%)',
                 background: 'none',
@@ -48,7 +57,7 @@ function Home() {
             onClick={onClick}
             style={{
                 position: 'absolute',
-                right: '-40px',
+                right: '-20px',
                 top: '50%',
                 transform: 'translateY(-50%)',
                 background: 'none',
@@ -62,11 +71,11 @@ function Home() {
         </button>
     );
 
-    const settings = {
+    const sliderSettings = {
         dots: false,
         infinite: true,
         speed: 500,
-        slidesToShow: 3,
+        slidesToShow: 6,
         slidesToScroll: 1,
         arrows: true,
         prevArrow: <CustomPrevArrow />,
@@ -74,37 +83,58 @@ function Home() {
         swipe: true,
     };
 
+    const sections = [
+        { title: "Recommended for You", books: getRandomBooks(15) },
+        { title: "Today's Top Picks", books: getRandomBooks(15) },
+        { title: "Based on Your Favorite Genre", books: getRandomBooks(15) },
+        { title: "Popular Among Your Friends", books: getRandomBooks(15) },
+    ];
+
     return (
-        <div style={{ textAlign: 'left', padding: '20px', position: 'relative', backgroundColor: '#FFD54F', minHeight: '100vh' }} >
+        <div
+            style={{
+                padding: '20px',
+                backgroundColor: '#FFD54F',
+                minHeight: '100vh',
+                overflowX: 'hidden', // Prevent horizontal scrolling
+            }}
+        >
+            <h1>Home Page</h1>
             <Modal isOpen={isModalOpen} book={selectedBook} onClose={closeModal} />
-            <h2>Recommended for You</h2>
-            <div style={{ position: 'relative', padding: '0 20px' }}>
-                <Slider {...settings}>
-                    {recommendedBooks.map((book, index) => (
-                        <div
-                            key={index}
-                            style={{ padding: '10px', textAlign: 'center', cursor: 'pointer' }}
-                            onClick={() => openModal(book)}
-                        >
-                            <h3>{book.title}</h3>
-                        </div>
-                    ))}
-                </Slider>
-            </div>
-            <h2>Todays Top Books</h2>
-            <div style={{ position: 'relative', padding: '0 20px' }}>
-            <Slider {...settings}>
-                    {recommendedBooks.map((book, index) => (
-                        <div
-                            key={index}
-                            style={{ padding: '10px', textAlign: 'center', cursor: 'pointer' }}
-                            onClick={() => openModal(book)}
-                        >
-                            <h3>{book.title}</h3>
-                        </div>
-                    ))}
-                </Slider>
-            </div>
+            {sections.map((section, index) => (
+                <div key={index} style={{ marginBottom: '30px' }}>
+                    <h2>{section.title}</h2>
+                    <div style={{ position: 'relative', padding: '20px 0' }}>
+                        <Slider {...sliderSettings}>
+                            {section.books.map((book, idx) => (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        padding: '10px',
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => openModal(book)}
+                                >
+                                    <img
+                                        src={book.cover_url}
+                                        alt={book.name}
+                                        style={{
+                                            width: '150px',
+                                            height: '200px',
+                                            objectFit: 'cover',
+                                            borderRadius: '8px',
+                                        }}
+                                    />
+                                    <h3 style={{ fontSize: '14px', margin: '10px 0 0' }}>
+                                        {book.name}
+                                    </h3>
+                                </div>
+                            ))}
+                        </Slider>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
