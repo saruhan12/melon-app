@@ -37,9 +37,20 @@ export const logout = async () => {
 };
 
 export const register = async (username, email, password) => {
-    const response = await axios.post(REGISTER_URL, {username, email, password}, { withCredentials: true });
-    return response.data;
+    try {
+        const response = await axios.post(
+            REGISTER_URL,
+            { username, email, password },
+            { withCredentials: true }
+        );
+        console.log('Register API response:', response); // Log response
+        return response.data;
+    } catch (error) {
+        console.error('Register API error:', error.response || error.message); // Log error details
+        throw error; // Re-throw the error for the caller to handle
+    }
 };
+
 
 export const authenticated_user = async () => {
     const response = await axios.get(AUTHENTICATED_URL, { withCredentials: true });

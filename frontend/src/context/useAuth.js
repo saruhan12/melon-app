@@ -39,15 +39,20 @@ export const AuthProvider = ({children}) => {
 
     const registerUser = async (username, email, password, confirm_password) => {
       try {
-        if (password === confirm_password) {
-          await register(username, email, password)
-          alert('User successfully registered')
-          nav('/login')
-        }
-      } catch {
-        alert('error registering user')
+          if (password === confirm_password) {
+              const response = await register(username, email, password);
+              console.log('Registration successful:', response); // Log response
+              alert('User successfully registered');
+              nav('/login');
+          } else {
+              alert('Passwords do not match');
+          }
+      } catch (error) {
+          console.error('Error registering user:', error.response || error.message); // Log error details
+          alert(`Error registering user: ${error.response?.data || error.message}`);
       }
-    }
+  };
+  
 
     useEffect(() => {
         get_authenticated_user();
