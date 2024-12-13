@@ -8,18 +8,19 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, Ou
 
 from .models import Todo
 from .serializers import TodoSerializer, UserRegisterSerializer, UserSerializer
-
+from rest_framework import status
 from datetime import datetime, timedelta
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([AllowAny])  # Yetkilendirme gerekmiyor
 def register(request):
     serializer = UserRegisterSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.error)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)  # Başarılı durumda 201 döner
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # Hatalı durumda 400 döner
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
