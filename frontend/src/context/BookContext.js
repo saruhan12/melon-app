@@ -8,10 +8,10 @@ export const BookProvider = ({ children }) => {
     const [bookReviews, setBookReviews] = useState({});
     const [bookGenres, setBookGenres] = useState({});
     const [genreBooks, setGenreBooks] = useState({});
-    const [allGenres, setAllGenres] = useState([]); // New state to hold unique genres
+    const [allGenres, setAllGenres] = useState([]);
     const [lastUpdated, setLastUpdated] = useState(null);
 
-    const normalizeBookId = (bookId) => parseInt(bookId, 10); // Normalize book IDs to integers
+    const normalizeBookId = (bookId) => parseInt(bookId, 10);
 
     const fetchBooksData = useCallback(() => {
         Papa.parse("/sonBooks.csv", {
@@ -23,13 +23,13 @@ export const BookProvider = ({ children }) => {
 
                 const genresMap = {};
                 const genreBooksMap = {};
-                const uniqueGenres = new Set(); // Use a Set to gather unique genres
+                const uniqueGenres = new Set();
 
                 books.forEach((book) => {
                     const bookGenres = book.genres
                         ? book.genres.split(",").map((genre) => genre.trim())
                         : [];
-                    
+
                     const bookData = {
                         id: normalizeBookId(book["Unnamed: 0"]),
                         name: book.name,
@@ -38,10 +38,8 @@ export const BookProvider = ({ children }) => {
                         genres: bookGenres,
                     };
 
-                    // Populate unique genres
                     bookGenres.forEach((genre) => uniqueGenres.add(genre));
 
-                    // Update genreBooksMap
                     bookGenres.forEach((genre) => {
                         if (!genreBooksMap[genre]) {
                             genreBooksMap[genre] = [];
@@ -49,25 +47,36 @@ export const BookProvider = ({ children }) => {
                         genreBooksMap[genre].push(bookData);
                     });
 
-                    // Update genresMap
                     genresMap[bookData.id] = bookGenres;
                 });
 
                 setBookGenres(genresMap);
                 setGenreBooks(genreBooksMap);
-                setAllGenres(Array.from(uniqueGenres).sort()); // Convert to array and sort alphabetically
+                setAllGenres(Array.from(uniqueGenres).sort());
 
-                // Set books for sliders
-                setSliderBooks({
-                    recommended: shuffled.slice(0, 15),
-                    topPicks: shuffled.slice(15, 30),
-                    favoriteGenres: shuffled.slice(30, 45),
-                    popularAmongFriends: shuffled.slice(45, 60),
-                });
+                setSliderBooks((prev) => ({
+                    ...prev,
+                    topPicks: shuffled.slice(0, 15),
+                    favoriteGenres: shuffled.slice(15, 30),
+                    popularAmongFriends: shuffled.slice(30, 45),
+                }));
 
                 setLastUpdated(Date.now());
             },
         });
+    }, []);
+
+    const fetchRecommendations = useCallback(() => {
+        fetch("/modelRec.json")
+            .then((response) => response.json())
+            .then((data) => {
+                // Set recommendations for the "Recommended for You" slider
+                setSliderBooks((prev) => ({
+                    ...prev,
+                    recommended: data,
+                }));
+            })
+            .catch((error) => console.error("Error fetching recommendations:", error));
     }, []);
 
     const fetchReviewsData = useCallback(() => {
@@ -76,8 +85,6 @@ export const BookProvider = ({ children }) => {
             download: true,
             complete: (result) => {
                 const reviews = result.data;
-
-                // Map reviews to their respective book IDs
                 const reviewsMap = {};
                 reviews.forEach((review) => {
                     const bookId = normalizeBookId(review.book_id);
@@ -86,7 +93,7 @@ export const BookProvider = ({ children }) => {
                     }
                     reviewsMap[bookId].push({
                         text: review.text || "No text provided.",
-                        rating: parseInt(review.rating, 10) || 0, // Default rating to 0 if missing
+                        rating: parseInt(review.rating, 10) || 0,
                     });
                 });
 
@@ -98,9 +105,10 @@ export const BookProvider = ({ children }) => {
     useEffect(() => {
         if (!lastUpdated || Date.now() - lastUpdated > 600000) {
             fetchBooksData();
+            fetchRecommendations();
             fetchReviewsData();
         }
-    }, [lastUpdated, fetchBooksData, fetchReviewsData]);
+    }, [lastUpdated, fetchBooksData, fetchRecommendations, fetchReviewsData]);
 
     return (
         <BookContext.Provider
@@ -109,7 +117,7 @@ export const BookProvider = ({ children }) => {
                 bookReviews,
                 bookGenres,
                 genreBooks,
-                allGenres, // Provide unique genres
+                allGenres,
             }}
         >
             {children}

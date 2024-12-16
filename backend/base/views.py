@@ -10,7 +10,13 @@ from .models import Todo
 from .serializers import TodoSerializer, UserRegisterSerializer, UserSerializer
 from rest_framework import status
 from datetime import datetime, timedelta
-
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
+from .models import Book, Genre
+from .serializers import BookSerializer, GenreSerializer
+from django.core.paginator import Paginator
 
 @api_view(['POST'])
 @permission_classes([AllowAny])  # Yetkilendirme gerekmiyor
@@ -123,3 +129,30 @@ def is_logged_in(request):
     serializer = UserSerializer(request.user, many=False)
     return Response(serializer.data)
 
+
+
+class BookViewSet(ModelViewSet):
+    queryset = Book.objects.prefetch_related('genres', 'reviews').all()
+    serializer_class = BookSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        genre_name = self.request.query_params.get('genre', None)
+        if genre_name:
+            queryset = queryset.filter(genres__name=genre_name)
+        return queryset
+
+
+class GenreViewSet(ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+
+# View for getting details of a specific book
+class BookDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            book = Book.objects.prefetch_related('genres', 'reviews').get(pk=pk)
+            serializer = BookSerializer(book)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Book.DoesNotExist:
+            return Response({"error": "Book not found"}, status=status.HTTP_404_NOT_FOUND)

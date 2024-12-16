@@ -1,21 +1,22 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import { ChakraProvider, Box, Button } from "@chakra-ui/react";
-import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { AuthProvider, useAuth } from "./context/useAuth";
 import Login from "./routes/Login";
-import Menu from "./routes/menu";
 import Register from "./routes/register";
-import Layout from "./components/layout";
-import PrivateRoute from "./components/private_route";
-
-import MelonImage from "./melon.webp";
 import Home from "./routes/Home";
 import Search from "./routes/Search";
 import Profile from "./routes/Profile";
 import { BookProvider } from "./context/BookContext";
 
+import MelonImage from "./melon.webp";
+
 const TopBar = () => {
+  const { logoutUser } = useAuth(); // Use the logout function from AuthContext
+
   return (
     <Box
       backgroundColor="#f0f0ee"
@@ -29,7 +30,7 @@ const TopBar = () => {
       width="100%"
       zIndex="1000"
     >
-      {/* Left Section: Logo and Buttons */}
+      {/* Left Section: Logo and Navigation */}
       <Box display="flex" alignItems="center" gap="10px">
         <img
           src={MelonImage}
@@ -52,17 +53,28 @@ const TopBar = () => {
           </Button>
         </Link>
       </Box>
-      {/* Right Section: Profile Button */}
-      <Box>
+
+      
+      <Box display="flex" alignItems="center" gap="10px">
         <Link to="/profile">
           <Button colorScheme="green" borderRadius="40px">
             Profile
           </Button>
         </Link>
+        <Button>
+          <Link to="/login">
+          <Button colorScheme="purple" borderRadius="40px" onClick={logoutUser}>
+          
+          Logout
+          </Button>
+        </Link>
+          
+        </Button>
       </Box>
     </Box>
   );
 };
+
 
 const App = () => {
   return (
@@ -80,34 +92,22 @@ const App = () => {
 
 const AppContent = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  
 
   if (loading) {
-    return <div>Loading...</div>; // Loading screen
+    return <div>Loading...</div>; // Show a loading spinner
   }
 
   return (
     <>
       {user && <TopBar />}
-      <Box paddingTop="80px" backgroundColor="#f8f9fa">
+      <Box paddingTop={user ? "80px" : "0"} backgroundColor="#f8f9fa">
         <Routes>
-          {/* Redirect "/" to "/login" */}
           <Route path="/" element={<Navigate to="/login" />} />
-          <Route
-            element={
-              <Layout>
-                <Login />
-              </Layout>
-            }
-            path="/login"
-          />
-          <Route
-            element={
-              <Layout>
-                <Register />
-              </Layout>
-            }
-            path="/register"
-          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/home" element={<Home />} />
           <Route path="/search" element={<Search />} />
           <Route path="/profile" element={<Profile />} />
@@ -116,6 +116,5 @@ const AppContent = () => {
     </>
   );
 };
-
 
 export default App;

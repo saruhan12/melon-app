@@ -72,7 +72,6 @@ function Home() {
         { title: "Recommended for You", books: sliderBooks.recommended },
         { title: "Today's Top Picks", books: sliderBooks.topPicks },
         { title: "Based on Your Favorite Genre", books: sliderBooks.favoriteGenres },
-        { title: "Popular Among Your Friends", books: sliderBooks.popularAmongFriends },
     ];
 
     return (
