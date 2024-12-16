@@ -26,7 +26,7 @@ export const AuthProvider = ({children}) => {
         const user = await login(username, password)
         if (user) {
           setUser(user)
-          nav('/')
+          nav('/home')
         } else {
           alert('Incorrect username or password')
         }

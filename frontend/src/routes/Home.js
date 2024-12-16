@@ -1,27 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import Slider from 'react-slick';
-import Papa from 'papaparse';
-import Modal from './Modal';
+import React, { useState } from "react";
+import Slider from "react-slick";
+import Modal from "./Modal";
+import { useBookContext } from "../context/BookContext";
 
 function Home() {
-    const [books, setBooks] = useState([]);
+    const { sliderBooks } = useBookContext();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
-
-    useEffect(() => {
-        Papa.parse('/booksConnu.csv', {
-            download: true,
-            header: true,
-            complete: (results) => {
-                setBooks(results.data);
-            },
-        });
-    }, []);
-
-    const getRandomBooks = (count) => {
-        const shuffled = books.sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, count);
-    };
 
     const openModal = (book) => {
         setSelectedBook(book);
@@ -37,14 +22,14 @@ function Home() {
         <button
             onClick={onClick}
             style={{
-                position: 'absolute',
-                left: '-20px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                fontSize: '24px',
-                cursor: 'pointer',
+                position: "absolute",
+                left: "-20px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                fontSize: "24px",
+                cursor: "pointer",
                 zIndex: 1,
             }}
         >
@@ -56,14 +41,14 @@ function Home() {
         <button
             onClick={onClick}
             style={{
-                position: 'absolute',
-                right: '-20px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                fontSize: '24px',
-                cursor: 'pointer',
+                position: "absolute",
+                right: "-20px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                fontSize: "24px",
+                cursor: "pointer",
                 zIndex: 1,
             }}
         >
@@ -71,11 +56,11 @@ function Home() {
         </button>
     );
 
-    const sliderSettings = {
+    const settings = {
         dots: false,
         infinite: true,
         speed: 500,
-        slidesToShow: 6,
+        slidesToShow: 7,
         slidesToScroll: 1,
         arrows: true,
         prevArrow: <CustomPrevArrow />,
@@ -83,36 +68,37 @@ function Home() {
         swipe: true,
     };
 
-    const sections = [
-        { title: "Recommended for You", books: getRandomBooks(15) },
-        { title: "Today's Top Picks", books: getRandomBooks(15) },
-        { title: "Based on Your Favorite Genre", books: getRandomBooks(15) },
-        { title: "Popular Among Your Friends", books: getRandomBooks(15) },
+    const sliders = [
+        { title: "Recommended for You", books: sliderBooks.recommended },
+        { title: "Today's Top Picks", books: sliderBooks.topPicks },
+        { title: "Based on Your Favorite Genre", books: sliderBooks.favoriteGenres },
+        { title: "Popular Among Your Friends", books: sliderBooks.popularAmongFriends },
     ];
 
     return (
         <div
             style={{
-                padding: '20px',
-                backgroundColor: '#FFD54F',
-                minHeight: '100vh',
-                overflowX: 'hidden', // Prevent horizontal scrolling
+                textAlign: "left",
+                padding: "20px",
+                position: "relative",
+                backgroundColor: "#FFD54F",
+                minHeight: "100vh",
             }}
         >
-            <h1>Home Page</h1>
             <Modal isOpen={isModalOpen} book={selectedBook} onClose={closeModal} />
-            {sections.map((section, index) => (
-                <div key={index} style={{ marginBottom: '30px' }}>
-                    <h2>{section.title}</h2>
-                    <div style={{ position: 'relative', padding: '20px 0' }}>
-                        <Slider {...sliderSettings}>
-                            {section.books.map((book, idx) => (
+
+            {sliders.map((slider, idx) => (
+                <div key={idx} style={{ marginBottom: "50px" }}>
+                    <h2>{slider.title}</h2>
+                    <div style={{ position: "relative", padding: "0 20px" }}>
+                        <Slider {...settings}>
+                            {slider.books.map((book, index) => (
                                 <div
-                                    key={idx}
+                                    key={index}
                                     style={{
-                                        padding: '10px',
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
+                                        padding: "10px",
+                                        textAlign: "center",
+                                        cursor: "pointer",
                                     }}
                                     onClick={() => openModal(book)}
                                 >
@@ -120,13 +106,18 @@ function Home() {
                                         src={book.cover_url}
                                         alt={book.name}
                                         style={{
-                                            width: '150px',
-                                            height: '200px',
-                                            objectFit: 'cover',
-                                            borderRadius: '8px',
+                                            width: "120px", // Set a smaller width
+                                            height: "160px", // Set a smaller height
+                                            objectFit: "cover",
+                                            borderRadius: "10px",
+                                            marginBottom: "10px",
                                         }}
                                     />
-                                    <h3 style={{ fontSize: '14px', margin: '10px 0 0' }}>
+                                    <h3
+                                        style={{
+                                            fontSize: "14px", // Adjust text size to match smaller images
+                                        }}
+                                    >
                                         {book.name}
                                     </h3>
                                 </div>

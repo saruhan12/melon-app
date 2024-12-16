@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { ChakraProvider, Box, Button } from "@chakra-ui/react";
-
+import { Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/useAuth";
 import Login from "./routes/Login";
 import Menu from "./routes/menu";
@@ -13,6 +13,7 @@ import MelonImage from "./melon.webp";
 import Home from "./routes/Home";
 import Search from "./routes/Search";
 import Profile from "./routes/Profile";
+import { BookProvider } from "./context/BookContext";
 
 const TopBar = () => {
   return (
@@ -24,6 +25,9 @@ const TopBar = () => {
       justifyContent="space-between"
       padding="0 20px"
       boxShadow="0 4px 6px rgba(0, 0, 0, 0.1)"
+      position="fixed"
+      width="100%"
+      zIndex="1000"
     >
       {/* Left Section: Logo and Buttons */}
       <Box display="flex" alignItems="center" gap="10px">
@@ -59,41 +63,59 @@ const TopBar = () => {
     </Box>
   );
 };
-//<AuthProvider>
-//<AppContent />
-//</AuthProvider>
+
 const App = () => {
   return (
     <ChakraProvider>
       <Router>
-        
-          <AppContent />
-        
+        <AuthProvider>
+          <BookProvider>
+            <AppContent />
+          </BookProvider>
+        </AuthProvider>
       </Router>
     </ChakraProvider>
   );
 };
 
 const AppContent = () => {
-  //const { user, loading } = useAuth();
+  const { user, loading } = useAuth();
 
-  //if (loading) {
-    //return <div>Loading...</div>; // Loading screen
-  //}
-  //{user && <TopBar />} in line 85 olmalı
+  if (loading) {
+    return <div>Loading...</div>; // Loading screen
+  }
+
   return (
-    <ChakraProvider>
-    
-      
-    <TopBar />
-      <Routes>
-        
-        <Route path="/home" element={<Home />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
-    </ChakraProvider>
+    <>
+      {user && <TopBar />}
+      <Box paddingTop="80px" backgroundColor="#f8f9fa">
+        <Routes>
+          {/* Redirect "/" to "/login" */}
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route
+            element={
+              <Layout>
+                <Login />
+              </Layout>
+            }
+            path="/login"
+          />
+          <Route
+            element={
+              <Layout>
+                <Register />
+              </Layout>
+            }
+            path="/register"
+          />
+          <Route path="/home" element={<Home />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
+      </Box>
+    </>
   );
 };
+
 
 export default App;

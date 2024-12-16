@@ -1,33 +1,156 @@
+/* Modal Container */
 .modal-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dark semi-transparent background */
-    backdrop-filter: blur(5px); /* Blurs the background */
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
 }
 
+/* Modal Content */
 .modal-content {
-    background: white;
-    padding: 20px;
+    background-color: white;
     border-radius: 10px;
-    width: 70%;
-    max-width: 600px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+/* Close Button */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 3px 8px; /* Reduced padding */
+    border-radius: 4px; /* Slightly reduced border radius */
+    font-size: 12px; /* Reduced font size */
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: black;
+}
+
+
+/* Modal Layout */
+.modal-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+/* Cover Photo */
+.modal-cover {
+    flex: 0 0 200px;
     text-align: center;
 }
 
-.close-button {
-    background: red;
+.modal-book-cover-large {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Right Content */
+.modal-right-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Review Container */
+.review-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-top: 20px;
+}
+
+/* Review List */
+.review-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.review {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+}
+/* Buttons */
+.see-reviews-button,
+.review-button,
+.submit-review-button,
+.cancel-review-button {
+    background-color: #007bff;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 12px 20px; /* Increased padding for larger size */
+    border-radius: 6px; /* Slightly larger border radius */
+    font-size: 16px; /* Increased font size for better visibility */
     cursor: pointer;
-    margin-top: 20px;
+    margin-right: 10px;
+}
+
+.review-button{
+    background-color: #038109;
+    color: white;
+    border: none;
+    padding: 12px 20px; /* Increased padding for larger size */
+    border-radius: 6px; /* Slightly larger border radius */
+    font-size: 16px; /* Increased font size for better visibility */
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.review-button:hover{
+    background-color: #b70bc7;
+}
+
+
+.see-reviews-button:hover,
+.submit-review-button:hover,
+.cancel-review-button:hover {
+    background-color: #6f42c1;
+}
+
+/* Specific Buttons */
+.submit-review-button {
+    background-color: #28a745;
+}
+
+.submit-review-button:hover {
+    background-color: #ffc107;
+}
+
+/* Stars Container */
+.stars-container {
+    display: flex;
+    gap: 5px;
+}
+
+/* Textarea */
+.review-textarea {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
