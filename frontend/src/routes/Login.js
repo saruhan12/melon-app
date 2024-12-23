@@ -3,24 +3,33 @@ import {
     FormControl,
     FormLabel,
     Button,
-    VStack,
     Input,
     Text,
 } from "@chakra-ui/react";
 import "./Login.css";
-import { useAuth } from "../context/useAuth";
+import { login } from "../api/endpoints"; // API'deki login fonksiyonu import ediliyor
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
-    const { loginUser } = useAuth();
+    const [error, setError] = useState(null); // Hata durumunu saklamak için
     const nav = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        await loginUser(username, password);
+        setError(null); // Önceki hataları temizle
+
+        try {
+            const response = await login(username, password);
+            if (response && response.success) {
+                nav("/home"); // Başarılı giriş sonrası yönlendirme
+            } else {
+                setError(response?.message || "Login failed. Please check your credentials.");
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || "An error occurred while trying to log in. Please try again.");
+        }
     };
 
     const handleNavigate = () => {
@@ -31,6 +40,9 @@ const Login = () => {
         <div style={{ backgroundColor: '#FFD54F', minHeight: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 0 }}>
             <form onSubmit={handleLogin} className="login-form">
                 <h2>Login</h2>
+                {error && (
+                    <Text color="red.500" fontSize="sm" mb="10px">{error}</Text>
+                )}
                 <FormControl mb="20px">
                     <FormLabel>Username</FormLabel>
                     <Input
