@@ -7,6 +7,8 @@ const REGISTER_URL = `${BASE_URL}register/`
 const LOGOUT_URL = `${BASE_URL}logout/`
 const NOTES_URL = `${BASE_URL}todos/`
 const AUTHENTICATED_URL = `${BASE_URL}authenticated/`
+const PROFILE_URL = `${BASE_URL}profile/`// Profil API endpoint'i
+
 
 axios.defaults.withCredentials = true; 
 
@@ -56,3 +58,14 @@ export const authenticated_user = async () => {
     const response = await axios.get(AUTHENTICATED_URL, { withCredentials: true });
     return response.data
 }
+
+
+export const fetchProfile = async () => {
+    try {
+        const response = await axios.get(PROFILE_URL, { withCredentials: true });
+        return response.data; // API'den dönen veriyi döndür
+    } catch (error) {
+        console.error("Error fetching profile:", error.response || error.message);
+        throw error;
+    }
+};

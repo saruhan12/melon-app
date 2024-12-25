@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import Modal from "./Modal";
 import { useBookContext } from "../context/BookContext";
+import { fetchProfile } from "../api/endpoints"; // API'den profil bilgilerini al
 
 function Profile() {
     const { sliderBooks } = useBookContext(); // Access books from context
@@ -9,18 +10,35 @@ function Profile() {
     const [selectedBook, setSelectedBook] = useState(null);
     const [favoriteBooks, setFavoriteBooks] = useState([]); // State for random favorite books
     const [reviewedBooks, setReviewedBooks] = useState([]); // State for reviewed books
-    const [favoriteGenre, setFavoriteGenre] = useState(""); // Favorite genre selected by the user
+    const [favorite_genre, setFavoriteGenre] = useState(""); // Favorite genre selected by the user
+    const [userInfo, setUserInfo] = useState({
+        avatar: "", // Varsayılan avatar
+        username: "",
+    });
     const [isSelectingGenre, setIsSelectingGenre] = useState(false); // Whether user is selecting a genre
-
-    const userInfo = {
-        avatar: "", // Empty or undefined means no custom avatar
-        username: "John Doe",
-    };
 
     // Default avatar image
     const defaultAvatar = "https://static.thenounproject.com/png/4121543-200.png";
 
-    // Fetch random favorite and reviewed books
+    // Kullanıcı bilgilerini yükle
+    useEffect(() => {
+        const loadProfile = async () => {
+            try {
+                const profile = await fetchProfile();
+                setUserInfo({
+                    avatar: profile.avatar || defaultAvatar,
+                    username: profile.username || "Unknown User",
+                });
+                setFavoriteGenre(profile.favorite_genre || ""); // Backend'den gelen favori tür
+            } catch (error) {
+                console.error("Failed to load profile:", error);
+            }
+        };
+
+        loadProfile();
+    }, []);
+
+    // Rastgele kitapları seç
     useEffect(() => {
         const fetchRandomBooks = () => {
             const allBooks = [
@@ -59,7 +77,7 @@ function Profile() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ favoriteGenre: selectedGenre }),
+                body: JSON.stringify({ favorite_genre: selectedGenre }),
             });
             if (!response.ok) {
                 console.error("Failed to update favorite genre");
@@ -83,16 +101,16 @@ function Profile() {
             {/* User Info Section */}
             <div style={styles.profileSection}>
                 <img
-                    src={userInfo.avatar || defaultAvatar} // Use defaultAvatar if no avatar is provided
+                    src={userInfo.avatar} // Kullanıcı avatarı
                     alt="User Avatar"
                     style={styles.avatar}
                 />
                 <div style={styles.userInfo}>
                     <h2 style={styles.username}>{userInfo.username}</h2>
-                    <div style={styles.favoriteGenre}>
-                        {favoriteGenre ? (
+                    <div style={styles.favorite_genre}>
+                        {favorite_genre ? (
                             <p style={styles.genreDisplay}>
-                                Your favorite genre is: <strong>{favoriteGenre}</strong>{" "}
+                                Your favorite genre is: <strong>{favorite_genre}</strong>{" "}
                                 <button
                                     style={styles.changeGenreButton}
                                     onClick={() => setIsSelectingGenre(true)}
@@ -112,7 +130,7 @@ function Profile() {
                         {isSelectingGenre && (
                             <select
                                 id="genre-select"
-                                value={favoriteGenre}
+                                value={favorite_genre}
                                 onChange={handleGenreChange}
                                 style={styles.genreSelect}
                             >
@@ -173,7 +191,6 @@ function Profile() {
         </div>
     );
 }
-
 const styles = {
     pageContainer: {
         backgroundColor: "#FFD54F",
@@ -208,7 +225,7 @@ const styles = {
         color: "#444",
         marginBottom: "15px",
     },
-    favoriteGenre: {
+    favorite_genre: {
         marginTop: "10px",
     },
     genreDisplay: {
