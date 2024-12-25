@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -6,17 +5,14 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
-from .models import Todo
-from .serializers import TodoSerializer, UserRegisterSerializer, UserSerializer
+from .models import Todo,CustomUser
+from .serializers import TodoSerializer, UserRegisterSerializer, UserSerializer,CustomUserSerializer
 from rest_framework import status
 from datetime import datetime, timedelta
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView
-from .models import Book, Genre
-from .serializers import BookSerializer, GenreSerializer
-from django.core.paginator import Paginator
+from rest_framework import viewsets, permissions
+
+
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])  # Yetkilendirme gerekmiyor
@@ -129,30 +125,22 @@ def is_logged_in(request):
     serializer = UserSerializer(request.user, many=False)
     return Response(serializer.data)
 
-
-
-class BookViewSet(ModelViewSet):
-    queryset = Book.objects.prefetch_related('genres', 'reviews').all()
-    serializer_class = BookSerializer
+class CustomUserViewSet(viewsets.ModelViewSet):
+    """
+    Kullanıcı bilgilerini görüntüleme ve favori tür güncelleme işlemleri için ViewSet.
+    """
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        genre_name = self.request.query_params.get('genre', None)
-        if genre_name:
-            queryset = queryset.filter(genres__name=genre_name)
-        return queryset
+        """
+        Yalnızca giriş yapan kullanıcının verilerini döner.
+        """
+        return CustomUser.objects.filter(id=self.request.user.id)
 
-
-class GenreViewSet(ModelViewSet):
-    queryset = Genre.objects.all()
-    serializer_class = GenreSerializer
-
-# View for getting details of a specific book
-class BookDetailView(APIView):
-    def get(self, request, pk):
-        try:
-            book = Book.objects.prefetch_related('genres', 'reviews').get(pk=pk)
-            serializer = BookSerializer(book)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Book.DoesNotExist:
-            return Response({"error": "Book not found"}, status=status.HTTP_404_NOT_FOUND)
+    def perform_update(self, serializer):
+        """
+        Kullanıcının kendi bilgilerini güncellemesini sağlar.
+        """
+        serializer.save()
