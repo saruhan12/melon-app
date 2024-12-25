@@ -1,13 +1,14 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import Book, Review, FavoriteBook, Author,BookGenreRelation
+from .models import Book, Review, FavoriteBook, Author,BookGenreRelation,BookGenre
 from .serializers import (
     BookDetailSerializer,
     ReviewSerializer,
     PersonalFavoriteBookSerializer,
     AuthorSerializer,
     BookCommentsSerializer,
+    BookSearchPageSerializer,
 )
 
 from rest_framework.decorators import action
@@ -170,3 +171,21 @@ class UserProfileFavoriteBookViewSet(viewsets.ViewSet):
 
 
 
+class RandomBooksByGenreViewSet(viewsets.ViewSet):
+    """
+    Her bir 'genre' için rastgele 20 kitap döndürür.
+    """
+
+    def list(self, request):
+        genres = BookGenre.objects.all()  # Tüm türleri al
+        result = []
+
+        for genre in genres:
+            books = Book.objects.filter(genres__genre=genre).order_by('?')[:20]  # Rastgele 20 kitap al
+            serialized_books = BookSearchPageSerializer(books, many=True).data
+            result.append({
+                'genre': genre.name,
+                'books': serialized_books
+            })
+
+        return Response(result)

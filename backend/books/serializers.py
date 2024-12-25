@@ -66,4 +66,14 @@ class BookCommentsSerializer(serializers.ModelSerializer):
 
     def __str__(self):
         return self.name
-    
+##############################################################################3
+
+
+class BookSearchPageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Book
+        fields = [ 'id','name', 'photo_url']#,'reviews'
+
+    def __str__(self):
+        return self.name
