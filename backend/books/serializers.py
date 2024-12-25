@@ -28,14 +28,6 @@ class BookGenreRelationSerializer(serializers.ModelSerializer):
         model = BookGenreRelation
         fields = ['book', 'genre']
 
-# Review Serializer
-class ReviewSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True) 
-    book = serializers.StringRelatedField()
-
-    class Meta:
-        model = Review
-        fields = ['user', 'book', 'date', 'content', 'stars']
 # FavoriteBook Serializer
 class PersonalFavoriteBookSerializer(serializers.ModelSerializer):
     book =serializers.StringRelatedField()
@@ -46,16 +38,41 @@ class PersonalFavoriteBookSerializer(serializers.ModelSerializer):
 
 class BookDetailSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)  # Yazar detaylarını ekle
-    genres = BookGenreRelationSerializer(many=True, read_only=True)
+    genres = serializers.SerializerMethodField() 
     #reviews = ReviewSerializer(many=True, read_only=True)  # Yorumları doğrudan ekle
 
     class Meta:
         model = Book
-        fields = [ 'name', 'release_date', 'author', 'genres',  'photo_url']#,'reviews'
+        fields = [ 'name', 'author', 'genres',  'photo_url']#,'reviews'
+
+    def __str__(self):
+        return self.name
+
+    def get_genres(self, obj):
+        # Kitap için türlerin adlarını bir liste olarak döndür
+        return [relation.genre.name for relation in BookGenreRelation.objects.filter(book=obj)]
+    
+
+##############################################################################
+class BookSearchPageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Book
+        fields = [ 'id','name', 'photo_url']#,'reviews'
 
     def __str__(self):
         return self.name
     
+    
+# Review Serializer
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True) 
+    book = serializers.StringRelatedField()
+
+    class Meta:
+        model = Review
+        fields = ['user', 'book', 'content', 'stars']
+
 
 class BookCommentsSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)  # Yorumları doğrudan ekle
@@ -63,17 +80,6 @@ class BookCommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ['reviews']
-
-    def __str__(self):
-        return self.name
-##############################################################################3
-
-
-class BookSearchPageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Book
-        fields = [ 'id','name', 'photo_url']#,'reviews'
 
     def __str__(self):
         return self.name

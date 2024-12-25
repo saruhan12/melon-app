@@ -23,6 +23,10 @@ from rest_framework import status
 from .models import Book
 from django.shortcuts import get_object_or_404
 
+import logging
+logger = logging.getLogger(__name__)
+import sys
+
 
 class BookDetailViewSet(viewsets.ModelViewSet):
     """
@@ -50,8 +54,11 @@ class BookDetailViewSet(viewsets.ModelViewSet):
         book = self.get_object()
         all_genres=BookGenreRelation.objects.filter()
         this_book_genres=all_genres.filter(book=book)
+        logger.debug(this_book_genres)
+        print("hello")
+        sys.stdout.write("Bu bir test mesajıdır.\n")
         serializer = ReviewSerializer(this_book_genres, many=True)
-        return Response(serializer.data)
+        return Response(serializer)
 
 
     @action(detail=False, methods=["get"])
